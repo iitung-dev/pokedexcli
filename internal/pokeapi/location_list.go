@@ -13,6 +13,20 @@ func (c *Client) LocationList(pageURL *string) (ResponseLocation, error) {
 		url = *pageURL
 	}
 
+	//check the cache
+	data, ok := c.cache.Get(url)
+	if ok {
+		// cache hit 
+		fmt.Println("cache hit!!")
+		responseLocation := ResponseLocation{}
+		err := json.Unmarshal(data, &responseLocation)
+		if err != nil {
+			return ResponseLocation{}, fmt.Errorf("Json unmarshal failed: %v", err)
+		}
+
+		return responseLocation, nil
+	}
+	fmt.Println("cache missed!!")
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return ResponseLocation{}, fmt.Errorf("Failed to construct GET request: %v", err)
@@ -28,7 +42,7 @@ func (c *Client) LocationList(pageURL *string) (ResponseLocation, error) {
 
 	defer resp.Body.Close()
 
-	data, err := io.ReadAll(resp.Body)
+	data, err = io.ReadAll(resp.Body)
 	if err != nil {
 		return ResponseLocation{}, fmt.Errorf("Response body error: %v", err)
 	}
@@ -38,6 +52,8 @@ func (c *Client) LocationList(pageURL *string) (ResponseLocation, error) {
 	if err != nil {
 		return ResponseLocation{}, fmt.Errorf("Json unmarshal failed: %v", err)
 	}
+	
+	c.cache.Add(url, data)
 
 	return responseLocation, nil
 }
