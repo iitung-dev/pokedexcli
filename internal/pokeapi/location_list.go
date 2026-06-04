@@ -27,6 +27,7 @@ func (c *Client) LocationList(pageURL *string) (ResponseLocation, error) {
 		return responseLocation, nil
 	}
 	fmt.Println("cache missed!!")
+	
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return ResponseLocation{}, fmt.Errorf("Failed to construct GET request: %v", err)
