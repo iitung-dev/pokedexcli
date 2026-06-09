@@ -11,6 +11,7 @@ func main() {
 
 	cfg := &config {
 		pokeapiClient: pokeClient,
+		myPokemon: make(map[string]pokeapi.ResponsePokemonInfo),
 	}
 
 	startRepl(cfg)
